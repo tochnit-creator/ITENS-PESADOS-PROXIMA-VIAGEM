@@ -1,0 +1,237 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.dash{padding:1.25rem 0}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.25rem}
+.kpi{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px;cursor:default;transition:border-color .2s}
+.kpi:hover{border-color:var(--color-border-primary)}
+.kpi .ico{width:32px;height:32px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:10px}
+.kpi .lbl{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.kpi .val{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1}
+.kpi .sub{font-size:11px;color:var(--color-text-secondary);margin-top:4px}
+.kpi.blue .ico{background:#E6F1FB;color:#185FA5}
+.kpi.green .ico{background:#EAF3DE;color:#3B6D11}
+.kpi.amber .ico{background:#FAEEDA;color:#854F0B}
+.kpi.purple .ico{background:#EEEDFE;color:#534AB7}
+.kpi.teal .ico{background:#E1F5EE;color:#0F6E56}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+
+.bar-wrap{margin-bottom:10px}
+.bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-secondary);margin-bottom:5px}
+.bar-track{height:8px;background:var(--color-background-secondary);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+.seg-bar{height:20px;border-radius:99px;overflow:hidden;display:flex;margin-bottom:8px}
+.seg-a{background:#378ADD;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.seg-b{background:#639922;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.legend-row{display:flex;gap:16px;font-size:12px;color:var(--color-text-secondary)}
+.legend-dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:middle}
+
+.filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.pill{font-size:12px;padding:4px 12px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;transition:all .15s}
+.pill.active{background:#E6F1FB;border-color:#85B7EB;color:#0C447C;font-weight:500}
+.pill.active.green{background:#EAF3DE;border-color:#97C459;color:#27500A}
+
+.item-list{display:flex;flex-direction:column;gap:8px}
+.item-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;border:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.item-card:hover{border-color:var(--color-border-secondary);background:var(--color-background-primary)}
+.item-card .ic-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.item-card .ic-name{font-size:13px;font-weight:500;color:var(--color-text-primary);line-height:1.3}
+.item-card .ic-brand{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.item-card .ic-badge{font-size:11px;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0}
+.ic-badge.blue{background:#E6F1FB;color:#0C447C}
+.ic-badge.green{background:#EAF3DE;color:#27500A}
+.item-card .ic-meta{display:flex;gap:12px;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--color-border-tertiary)}
+.item-card .ic-stat{font-size:11px;color:var(--color-text-secondary)}
+.item-card .ic-stat span{font-weight:500;color:var(--color-text-primary)}
+.item-card .ic-bar{height:3px;background:var(--color-background-primary);border-radius:99px;margin-top:8px;overflow:hidden}
+.item-card .ic-bar-fill{height:100%;background:#378ADD;border-radius:99px}
+
+.detail-overlay{display:none;position:relative;z-index:10;margin-top:-4px;margin-bottom:8px}
+.detail-overlay.open{display:block}
+.detail-box{background:var(--color-background-primary);border:0.5px solid var(--color-border-primary);border-radius:var(--border-radius-lg);padding:14px 16px}
+.detail-box .d-title{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.d-field{font-size:12px}
+.d-field .d-key{color:var(--color-text-secondary);margin-bottom:2px}
+.d-field .d-val{color:var(--color-text-primary);font-weight:500}
+.close-btn{float:right;font-size:11px;color:var(--color-text-secondary);cursor:pointer;padding:2px 6px;border-radius:4px;border:0.5px solid var(--color-border-tertiary)}
+.close-btn:hover{background:var(--color-background-secondary)}
+
+.donut-wrap{position:relative;width:130px;height:130px;margin:0 auto}
+.donut-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.donut-label .dl-val{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.donut-label .dl-sub{font-size:10px;color:var(--color-text-secondary)}
+
+.anim-num{transition:all .4s}
+</style>
+
+<h2 class="sr-only">Dashboard de formação de cargas — pesados vs leves: 16 itens pesados (11%) e 129 itens leves (89%), totalizando 1.687 kg.</h2>
+
+<div class="dash">
+
+  <div class="kpi-grid">
+    <div class="kpi blue"><div class="ico"><i class="ti ti-packages" aria-hidden="true"></i></div><div class="lbl">Total itens</div><div class="val" id="kTotal">145</div><div class="sub">rota 80.252</div></div>
+    <div class="kpi blue"><div class="ico"><i class="ti ti-barbell" aria-hidden="true"></i></div><div class="lbl">Itens pesados</div><div class="val" id="kHeavy">16</div><div class="sub" id="kHeavyPct">11% dos itens</div></div>
+    <div class="kpi green"><div class="ico"><i class="ti ti-feather" aria-hidden="true"></i></div><div class="lbl">Itens leves</div><div class="val" id="kLight">129</div><div class="sub" id="kLightPct">89% dos itens</div></div>
+    <div class="kpi amber"><div class="ico"><i class="ti ti-weight" aria-hidden="true"></i></div><div class="lbl">Peso pesados</div><div class="val">1.294</div><div class="sub">kg · 77% do peso</div></div>
+    <div class="kpi teal"><div class="ico"><i class="ti ti-scale" aria-hidden="true"></i></div><div class="lbl">Peso leves</div><div class="val">393</div><div class="sub">kg · 23% do peso</div></div>
+    <div class="kpi purple"><div class="ico"><i class="ti ti-truck" aria-hidden="true"></i></div><div class="lbl">Peso total</div><div class="val">1.687</div><div class="sub">kg na carga</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-donut" aria-hidden="true"></i> distribuição por quantidade</div>
+      <div class="donut-wrap">
+        <canvas id="cDonut1" role="img" aria-label="Donut: 11% pesados, 89% leves">Pesados 11%, Leves 89%</canvas>
+        <div class="donut-label"><div class="dl-val">145</div><div class="dl-sub">itens</div></div>
+      </div>
+      <div class="legend-row" style="margin-top:14px;justify-content:center">
+        <span><span class="legend-dot" style="background:#378ADD"></span>Pesados 11%</span>
+        <span><span class="legend-dot" style="background:#639922"></span>Leves 89%</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-donut" aria-hidden="true"></i> distribuição por peso (kg)</div>
+      <div class="donut-wrap">
+        <canvas id="cDonut2" role="img" aria-label="Donut: 77% peso pesados, 23% peso leves">Pesados 77%, Leves 23%</canvas>
+        <div class="donut-label"><div class="dl-val">1.687</div><div class="dl-sub">kg</div></div>
+      </div>
+      <div class="legend-row" style="margin-top:14px;justify-content:center">
+        <span><span class="legend-dot" style="background:#378ADD"></span>Pesados 77%</span>
+        <span><span class="legend-dot" style="background:#639922"></span>Leves 23%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.25rem">
+    <div class="card-title"><i class="ti ti-chart-bar" aria-hidden="true"></i> peso por marca — itens pesados</div>
+    <div id="brandBars"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-list" aria-hidden="true"></i> itens pesados — detalhes</div>
+    <div class="filter-row">
+      <button class="pill active" onclick="filterItems('all',this)">Todos (16)</button>
+      <button class="pill" onclick="filterItems('loucas',this)">L&C Louças</button>
+      <button class="pill" onclick="filterItems('tubos',this)">Tubos</button>
+      <button class="pill" onclick="filterItems('outros',this)">Outros</button>
+    </div>
+    <div class="item-list" id="itemList"></div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const items = [
+  {n:'Bacia Loren-Joy p/cx acopl. BR',brand:'L&C Louças',cat:'loucas',qty:29,peso:484,cfr:'7711049',code:'14618'},
+  {n:'Cx acopl. simples 6lt Way/Joy/One BR',brand:'L&C Louças',cat:'loucas',qty:40,peso:508,cfr:'7712044',code:'7485'},
+  {n:'Bacia Loren-Way conv. BR',brand:'L&C Louças',cat:'loucas',qty:10,peso:154,cfr:'7710024',code:'7487'},
+  {n:'Bacia Loren-Joy conv. BR',brand:'L&C Louças',cat:'loucas',qty:3,peso:46,cfr:'7710047',code:'16573'},
+  {n:'Tubo esgoto 100-6mts Kitubos',brand:'Ki-Tubos',cat:'tubos',qty:3,peso:0,cfr:'3231',code:'15637'},
+  {n:'Tubo esgoto 100-6mts Corr Plastik',brand:'Corr Plastik',cat:'tubos',qty:10,peso:53,cfr:'0303210008',code:'17101'},
+  {n:'Tubo água marrom 25-6mts Corr Plastik',brand:'Corr Plastik',cat:'tubos',qty:40,peso:49,cfr:'0303200005',code:'17091'},
+  {n:'Tubo esgoto 40-6mts Tigre',brand:'Tigre Conexões',cat:'tubos',qty:4,peso:0,cfr:'11111700',code:'10615'},
+  {n:'Tubo esgoto 75-6mts Tigre',brand:'Tigre Conexões',cat:'tubos',qty:5,peso:0,cfr:'11030904',code:'10617'},
+  {n:'Tubo esgoto 100-6mts Tigre',brand:'Tigre Conexões',cat:'tubos',qty:10,peso:0,cfr:'11031030',code:'10618'},
+  {n:'Tubo água marrom 25-6mts Tigre',brand:'Tigre Conexões',cat:'tubos',qty:32,peso:0,cfr:'10120250',code:'10609'},
+  {n:'Tubo esgoto 75-6mts Kitubos',brand:'Ki-Tubos',cat:'tubos',qty:2,peso:0,cfr:'0000003232',code:'15643'},
+  {n:'Tubo esgoto 50-6mts Kitubos',brand:'Ki-Tubos',cat:'tubos',qty:2,peso:0,cfr:'0000003233',code:'15644'},
+  {n:'Tubo água marrom 25-6mts Krona',brand:'Krona',cat:'tubos',qty:1,peso:0,cfr:'0024',code:'9714'},
+  {n:'Tubo água marrom 50-6mts Krona',brand:'Krona',cat:'tubos',qty:1,peso:0,cfr:'0027',code:'9717'},
+  {n:'Caixa d\'água c/tampa 1000L',brand:'Fortlev',cat:'outros',qty:1,peso:0,cfr:'2010007',code:'15652'},
+];
+
+const maxPeso = 508;
+
+function renderItems(filter){
+  const list = document.getElementById('itemList');
+  const data = filter === 'all' ? items : items.filter(i=>i.cat===filter);
+  list.innerHTML = '';
+  data.forEach((item,idx)=>{
+    const pct = item.peso > 0 ? Math.round((item.peso/maxPeso)*100) : 0;
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <div class="item-card" onclick="toggleDetail(this,'${idx}')">
+        <div class="ic-head">
+          <div><div class="ic-name">${item.n}</div><div class="ic-brand">${item.brand}</div></div>
+          <span class="ic-badge blue">Pesado</span>
+        </div>
+        <div class="ic-meta">
+          <div class="ic-stat">Qtd <span>${item.qty} pc</span></div>
+          <div class="ic-stat">Peso <span>${item.peso > 0 ? item.peso+' kg' : '—'}</span></div>
+          <div class="ic-stat">Cód. <span>${item.code}</span></div>
+        </div>
+        ${item.peso > 0 ? `<div class="ic-bar"><div class="ic-bar-fill" style="width:${pct}%"></div></div>` : ''}
+      </div>
+      <div class="detail-overlay" id="det-${idx}">
+        <div class="detail-box">
+          <button class="close-btn" onclick="event.stopPropagation();closeDetail(${idx})"><i class="ti ti-x" style="font-size:11px" aria-hidden="true"></i> fechar</button>
+          <div class="d-title">${item.n}</div>
+          <div class="detail-grid">
+            <div class="d-field"><div class="d-key">Marca</div><div class="d-val">${item.brand}</div></div>
+            <div class="d-field"><div class="d-key">Código interno</div><div class="d-val">${item.code}</div></div>
+            <div class="d-field"><div class="d-key">CFR</div><div class="d-val">${item.cfr}</div></div>
+            <div class="d-field"><div class="d-key">Quantidade</div><div class="d-val">${item.qty} pc</div></div>
+            <div class="d-field"><div class="d-key">Peso registrado</div><div class="d-val">${item.peso > 0 ? item.peso+' kg' : 'não informado'}</div></div>
+            <div class="d-field"><div class="d-key">Categoria</div><div class="d-val">${item.cat === 'loucas' ? 'Louças' : item.cat === 'tubos' ? 'Tubos' : 'Outros'}</div></div>
+          </div>
+        </div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function toggleDetail(card, idx){
+  const ov = document.getElementById('det-'+idx);
+  const isOpen = ov.classList.contains('open');
+  document.querySelectorAll('.detail-overlay.open').forEach(el=>el.classList.remove('open'));
+  if(!isOpen) ov.classList.add('open');
+}
+function closeDetail(idx){ document.getElementById('det-'+idx).classList.remove('open'); }
+
+function filterItems(cat, btn){
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  renderItems(cat);
+}
+
+const brandMap = {};
+items.forEach(i=>{ brandMap[i.brand] = (brandMap[i.brand]||0) + i.peso; });
+const bLabels = Object.keys(brandMap);
+const bVals = bLabels.map(k=>brandMap[k]);
+const bMax = Math.max(...bVals);
+const brandContainer = document.getElementById('brandBars');
+bLabels.forEach((b,i)=>{
+  const pct = bMax > 0 ? Math.round((bVals[i]/bMax)*100) : 0;
+  brandContainer.innerHTML += `<div class="bar-wrap">
+    <div class="bar-label"><span>${b}</span><span>${bVals[i]} kg</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:0%;background:#378ADD" data-w="${pct}"></div></div>
+  </div>`;
+});
+
+new Chart(document.getElementById('cDonut1'),{
+  type:'doughnut',
+  data:{labels:['Pesados','Leves'],datasets:[{data:[11,89],backgroundColor:['#378ADD','#639922'],borderWidth:0,hoverOffset:4}]},
+  options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.label+': '+c.parsed+'%'}}}}
+});
+new Chart(document.getElementById('cDonut2'),{
+  type:'doughnut',
+  data:{labels:['Pesados','Leves'],datasets:[{data:[77,23],backgroundColor:['#378ADD','#639922'],borderWidth:0,hoverOffset:4}]},
+  options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.label+': '+c.parsed+'%'}}}}
+});
+
+renderItems('all');
+
+setTimeout(()=>{
+  document.querySelectorAll('.bar-fill').forEach(el=>{
+    el.style.transition='width 1s cubic-bezier(.4,0,.2,1)';
+    el.style.width = el.dataset.w + '%';
+  });
+},200);
+</script>
